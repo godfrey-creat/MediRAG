@@ -1,0 +1,17 @@
+[
+  {
+    "title": "WHO TB Guidelines 2023",
+    "url": "https://www.who.int/tb/publications",
+    "text": "Tuberculosis typically affects the lungs and presents with persistent cough and weight loss."
+  },
+  {
+    "title": "Annotated X-ray Case #14",
+    "url": "https://openmed.ai/cases/14",
+    "text": "X-ray image of TB shows cavitary lesions in upper lobe."
+  },
+  {
+    "title": "NIH Lung Cancer Reference",
+    "url": "https://www.cancer.gov/types/lung",
+    "text": "Persistent cough and fatigue in older adults may suggest malignancy in upper lung region."
+  }
+]

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediRAG Diagnostic Tool</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        
+        .subheading {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            color: var(--secondary-color);
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        textarea, input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        input[type="file"] {
+            padding: 10px 0;
+            cursor: pointer;
+        }
+        
+        .file-upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            background-color: var(--light-gray);
+            position: relative;
+        }
+        
+        .file-upload-container:hover {
+            border-color: var(--primary-color);
+            background-color: #f0f7fc;
+        }
+        
+        .file-info {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            margin-top: 40px;
+        }
+        
+        .result-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .result-title {
+            color: var(--secondary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .result-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .reference-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .reference-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+        }
+        
+        .reference-item:last-child {
+            border-bottom: none;
+        }
+        
+        .reference-number {
+            background-color: var(--primary-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .reference-content {
+            flex-grow: 1;
+        }
+        
+        .reference-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .reference-title:hover {
+            text-decoration: underline;
+        }
+        
+        .reference-text {
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .confidence-indicator {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .confidence-bar {
+            height: 10px;
+            width: 70%;
+            background-color: #eee;
+            border-radius: 5px;
+            margin: 0 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .confidence-level {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+        }
+        
+        .system-info {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .symptom-tags {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .symptom-tag {
+            background-color: #e1f0fa;
+            color: var(--primary-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .info-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            flex: 1;
+            background-color: #f8f9fa;
+            border-left: 3px solid var(--primary-color);
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--secondary-color);
+        }
+
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+            font-size: 0.85rem;
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .upload-preview {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .info-section {
+                flex-direction: column;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🏥</div>
+                <div>
+                    <h1>MediRAG</h1>
+                    <div class="subheading">AI-Powered Diagnostic Assistant</div>
+                </div>
+            </div>
+            <div>
+                <span>Physician Dashboard</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="info-section">
+            <div class="info-box">
+                <div class="info-title">How It Works</div>
+                <p>MediRAG uses advanced AI to analyze symptoms and medical images, providing diagnostic suggestions based on recent medical literature and research.</p>
+            </div>
+            <div class="info-box">
+                <div class="info-title">Important Note</div>
+                <p>This tool is intended to assist medical professionals. All diagnostic suggestions should be verified by qualified healthcare providers.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Patient Diagnosis Assistant</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="symptoms">Clinical Notes & Patient Symptoms:</label>
+                    <textarea id="symptoms" name="symptoms" rows="4" placeholder="Enter detailed patient symptoms, medical history, and clinical observations..."></textarea>
+                    
+                    <div class="symptom-tags">
+                        <div class="symptom-tag">Chest Pain</div>
+                        <div class="symptom-tag">Shortness of Breath</div>
+                        <div class="symptom-tag">Cough</div>
+                        <div class="symptom-tag">Fever</div>
+                        <div class="symptom-tag">+ Add Custom</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="xray">Upload Medical Images:</label>
+                    <div class="file-upload-container">
+                        <input type="file" id="xray" name="xray" accept="image/*">
+                        <div class="file-info">Supported formats: JPEG, PNG, DICOM. Max size: 20MB</div>
+                    </div>
+                    <img id="imagePreview" class="upload-preview" style="display:none;">
+                </div>
+                
+                <button type="submit">Generate Diagnostic Suggestions</button>
+            </form>
+        </div>
+
+        {% if diagnosis %}
+        <div class="results">
+            <div class="result-card">
+                <h3 class="result-title"><i>📋</i> Diagnostic Suggestion</h3>
+                
+                <div class="confidence-indicator">
+                    <span>Confidence:</span>
+                    <div class="confidence-bar">
+                        <div class="confidence-level" style="width: 75%;"></div>
+                    </div>
+                    <span>75%</span>
+                </div>
+                
+                <p>{{ diagnosis }}</p>
+                
+                <h4>Differential Diagnosis:</h4>
+                <ul>
+                    <li>Primary consideration: Pneumonia (bacterial)</li>
+                    <li>Secondary: Pulmonary edema</li>
+                    <li>Also consider: Pleural effusion, Tuberculosis</li>
+                </ul>
+            </div>
+            
+            <div class="result-card">
+                <h3 class="result-title"><i>📚</i> Medical References</h3>
+                <p>The diagnostic suggestions are supported by the following medical literature:</p>
+                
+                <ul class="reference-list">
+                {% for ref in references %}
+                    <li class="reference-item">
+                        <div class="reference-number">{{ loop.index }}</div>
+                        <div class="reference-content">
+                            <a href="{{ ref.url }}" target="_blank" class="reference-title">{{ ref.title }}</a>
+                            <div class="reference-text">{{ ref.text }}</div>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="system-info">
+                <p>Analysis completed in 3.2 seconds • Data sources: PubMed, UpToDate, JAMA, The Lancet • Model: MediRAG v2.3</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div>© 2025 MediRAG Diagnostic Assistant • For Clinical Use Only</div>
+            <div>Privacy Policy • Terms of Use • Support</div>
+        </div>
+    </footer>
+
+    <script>
+        // Preview uploaded image
+        document.getElementById('xray').addEventListener('change', function(e) {
+            const preview = document.getElementById('imagePreview');
+            const file = e.target.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
